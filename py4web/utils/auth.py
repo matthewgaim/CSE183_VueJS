@@ -188,6 +188,7 @@ class Auth(Fixture):
                 ),
                 Field("first_name", requires=ne),
                 Field("last_name", requires=ne),
+                Field("profile_pic", default="https://merriam-webster.com/assets/mw/images/article/art-wap-landing-mp-lg/egg-3442-4c317615ec1fd800728672f2c168aca5@1x.jpg"),
                 Field("sso_id", readable=False, writable=False),
                 Field("action_token", readable=False, writable=False),
                 Field(
