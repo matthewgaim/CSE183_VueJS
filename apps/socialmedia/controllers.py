@@ -56,7 +56,8 @@ def index():
         delete_url = URL('delete_post', signer=url_signer),
         user_email = auth.current_user.get('email'),
         author_name = auth.current_user.get('first_name') + " " + auth.current_user.get('last_name'),
-        profile_pic = auth.current_user.get('profile_pic')
+        profile_pic = auth.current_user.get('profile_pic'),
+        like_post_url = URL('like_post', signer=url_signer),
      )
 
 
@@ -66,10 +67,33 @@ def get_posts():
     # You can use this shortcut for testing at the very beginning.
     # TODO: complete.
     posts = db(db.post).select().as_list()
+    likes = db(db.thumb).select().as_list()
     for post in posts:
         cName = db(db.auth_user.email == post['email']).select().first()
         post["author"] = cName.first_name + " " + cName.last_name if cName is not None else "Unknown"
         post["profile_pic"] = cName.profile_pic
+        post["like"] = "empty"
+        post["likeCount"] = 0
+        post["dislikeCount"] = 0
+        for refs in likes:
+            if refs['post_id'] == post['id'] and refs['user_email'] == auth.current_user.get('email'):
+                if refs['rating'] == 1:
+                    post["like"] = "like"
+                    post["likeCount"] += 1
+                elif refs['rating'] == 2:
+                    post["like"] = "dislike"
+                    post["dislikeCount"] += 1
+                else:
+                    post["like"] = "empty"
+
+            elif refs['post_id'] == post['id']:
+                if refs['rating'] == 1:
+                    post["likeCount"] += 1
+                elif refs['rating'] == 2:
+                    post["dislikeCount"] += 1
+                else:
+                    post["like"] = "empty"
+
     return dict(posts=posts)
 
 
@@ -111,3 +135,15 @@ def delete_all_posts():
     """This should be removed before you use the app in production!"""
     db(db.post).delete()
     return "ok"
+
+@action('like_post', method="POST")
+@action.uses(url_signer.verify(), db)
+def like_post():
+    #TODO: Update/Insert
+    id = db.thumb.update_or_insert(
+        ((db.thumb.user_email == auth.current_user.get('email')) & (db.thumb.post_id == request.json.get('post_id'))),
+        user_email=auth.current_user.get('email'),
+        post_id=request.json.get('post_id'),
+        rating=request.json.get('rating')
+    )
+    return dict(id=id)

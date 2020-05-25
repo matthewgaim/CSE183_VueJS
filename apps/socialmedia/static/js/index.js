@@ -108,6 +108,7 @@ let init = (app) => {
             email: user_email,
             profile_pic: profile_pic,
             is_reply: null,
+            like: "empty",
         };
         // TODO:
         // ... you need to insert it at the top of the post list.
@@ -157,6 +158,39 @@ let init = (app) => {
         }
     };
 
+    app.like_post = (like_idx, choice) => {
+        const id = app.vue.posts[like_idx].id;
+        var rating = 0;
+        if(choice == 'like'){
+            if(app.vue.posts[like_idx].like==='empty'){
+                rating = 1;
+            }
+            else if(app.vue.posts[like_idx].like==='like'){
+                rating = 0;
+            }
+            else if(app.vue.posts[like_idx].like==='dislike'){
+                rating = 1;
+            }
+        }
+        else if(choice == 'dislike'){
+            if(app.vue.posts[like_idx].like==='empty'){
+                rating = 2;
+            }
+            else if(app.vue.posts[like_idx].like==='like'){
+                rating = 2;
+            }
+            else if(app.vue.posts[like_idx].like==='dislike'){
+                rating = 0;
+            }
+        }
+        axios.post(like_post_url, {
+            post_id: id,
+            rating: rating
+        }).then(function (response) {
+            app.init();
+        });
+    };
+
     // We form the dictionary of all methods, so we can assign them
     // to the Vue app in a single blow.
     app.methods = {
@@ -166,6 +200,7 @@ let init = (app) => {
         add_post: app.add_post,
         reply: app.reply,
         do_delete: app.do_delete,
+        like_post: app.like_post,
     };
 
     // This creates the Vue instance.

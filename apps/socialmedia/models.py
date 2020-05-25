@@ -28,4 +28,10 @@ db.define_table("post",
                 Field('is_reply', 'reference post'),
                 )
 
+db.define_table('thumb',
+                Field('user_email', default=get_user_email()),
+                Field('post_id', 'reference post'),
+                Field('rating', 'integer', default=0)
+                )
+
 db.commit()

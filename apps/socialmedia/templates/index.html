@@ -2,7 +2,12 @@
 
 <div id="vue-target">
   <section class="section">
-    <div class="title">Twitter Remake</div>
+    <div class="title level">
+        Home - Logged in as {{ author_name }}
+        <figure class="is-128x128 image" style="margin-bottom: 1em">
+          <img class="is-rounded" :src="profile_pic">
+        </figure >
+    </div>
 
     <!-- This is used to add a post. --->
     <div class="level">
@@ -32,7 +37,24 @@
             </div>
           <nav class="level is-mobile">
             <div class="level-left">
-              <!-- Post author -->
+              <div class="thumbs is-size-4" v-if="post.id !== null">
+              <span class="has-text-info"  >
+                <span @click="like_post(post._idx, 'like')">
+                  <i class="fa fa-flip-horizontal fa-thumbs-up" v-if="post.like === 'like'"></i>
+                  <i class="fa fa-flip-horizontal fa-thumbs-o-up" v-else></i>
+                </span>
+                  <span class="is-size-7" v-if="post.likeCount !== 0">
+                  {{ post.likeCount }}
+                </span>
+                <span @click="like_post(post._idx, 'dislike')">
+                  <i class="fa fa-thumbs-down" v-if="post.like === 'dislike'"></i>
+                  <i class="fa fa-thumbs-o-down" v-else></i>
+                </span>
+              </span>
+                <span class="is-size-7" v-if="post.dislikeCount !== 0">
+                  {{ post.dislikeCount }}
+                </span>
+            </div>
             </div>
 
             <div class="level-right">
@@ -41,6 +63,7 @@
                 <i class="fa fa-exclamation-triangle"></i></div>
               <!-- Edit button -->
               <!-- TODO: implement it -->
+
                 <div v-if="post.email === user_email && !post.edit" class="level-item">
                     <button @click="do_edit(post._idx)" class="button is-warning" >
                         <i class="fa fa-edit fa-fw"></i>
@@ -88,6 +111,7 @@
   let user_email = "[[=XML(user_email)]]";
   let author_name = "[[=XML(author_name)]]";
   let profile_pic = "[[=XML(profile_pic)]]";
+  let like_post_url = "[[=XML(like_post_url)]]"
 </script>
 <script src="js/index.js"></script>
 [[end]]
