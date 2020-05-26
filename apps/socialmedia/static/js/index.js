@@ -4,6 +4,9 @@ let app = {};
 
 // Given an empty app object, initializes it filling its attributes,
 // creates a Vue instance, and then initializes the Vue instance.
+
+
+
 let init = (app) => {
 
     // This is the Vue data.
@@ -12,6 +15,7 @@ let init = (app) => {
         user_email: user_email,
         author_name: author_name,
         profile_pic: profile_pic,
+        previewImage: null
     };
 
     app.index = (a) => {
@@ -68,12 +72,13 @@ let init = (app) => {
     app.do_save = (post_idx) => {
         // Handler for "Save edit" button.
         let p = app.vue.posts[post_idx];
-        if (p.content !== p.server_content) {
+        if (p.content !== p.server_content || p.image !== null) {
             p.is_pending = true;
             axios.post(posts_url, {
                 content: p.content,
                 id: p.id,
                 is_reply: p.is_reply,
+                image: p.image,
             }).then((result) => {
                 console.log("Received:", result.data);
                 // TODO: You are receiving the post id (in case it was inserted),
@@ -109,6 +114,7 @@ let init = (app) => {
             profile_pic: profile_pic,
             is_reply: null,
             like: "empty",
+            image: null,
         };
         // TODO:
         // ... you need to insert it at the top of the post list.
@@ -131,6 +137,7 @@ let init = (app) => {
                 email: user_email,
                 is_reply: p.id,
                 profile_pic: profile_pic,
+                image: null,
             };
             // TODO: and you need to insert it in the right place, and reindex
             // the posts.  Look at the code for app.add_post; it is similar.
@@ -191,6 +198,7 @@ let init = (app) => {
         });
     };
 
+
     // We form the dictionary of all methods, so we can assign them
     // to the Vue app in a single blow.
     app.methods = {
@@ -201,6 +209,16 @@ let init = (app) => {
         reply: app.reply,
         do_delete: app.do_delete,
         like_post: app.like_post,
+        uploadImage: function(e, post_idx){
+            alert(post_idx);
+            const image = e.target.files[0];
+            const reader = new FileReader();
+            reader.readAsDataURL(image);
+            reader.onload = e => {
+                app.data.posts[post_idx].image = e.target.result;
+                console.log(app.data.posts[post_idx].image);
+            };
+        }
     };
 
     // This creates the Vue instance.

@@ -107,6 +107,7 @@ def save_post():
     #     raise HTTP(500)
     id = request.json.get('id') # Note: id can be none.
     content = request.json.get('content')
+    image = request.json.get('image')
     is_reply = request.json.get('is_reply')
     # TODO: complete.
     # If id is None, this means that this is a new post that needs to be
@@ -114,10 +115,11 @@ def save_post():
     if id == None:
         db.post.insert(
             content=content,
+            image=image,
             is_reply=is_reply,
         )
     else:
-        db.post.update_or_insert((id == db.post.id), id=id, content=content, is_reply=is_reply)
+        db.post.update_or_insert((id == db.post.id), image=image, content=content, is_reply=is_reply)
     return dict(content=content, id=id)
 
 

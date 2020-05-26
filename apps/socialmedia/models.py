@@ -26,6 +26,7 @@ db.define_table("post",
                 Field('content', 'text'),
                 Field('post_date', 'datetime', default=get_time),
                 Field('is_reply', 'reference post'),
+                Field('image', 'text'),
                 )
 
 db.define_table('thumb',

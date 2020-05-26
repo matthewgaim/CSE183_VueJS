@@ -5,8 +5,8 @@
     <div class="title level">
         Home - Logged in as {{ author_name }}
         <figure class="is-128x128 image" style="margin-bottom: 1em">
-          <img class="is-rounded" :src="profile_pic">
-        </figure >
+            <img class="is-rounded" :src="profile_pic" >
+        </figure>
     </div>
 
     <!-- This is used to add a post. --->
@@ -25,77 +25,86 @@
       <div class="columns is-mobile">
 
         <div :class="post.is_reply ? 'column is-10 is-offset-1 is-size-6' : 'column is-11 is-size-5'">
-            <div class="box">
-                <figure class="is-64x64 image" style="margin-bottom: 1em">
-                  <img class="is-rounded" :src="post.profile_pic">
-                </figure >
-                <div class="has-text-grey">{{post.author}}</div>
-                <div v-if="!post.edit" @click="do_edit(post._idx)">{{post.content}}</div>
-                <textarea v-if="post.edit" v-model="post.content" class="textarea"
-                          :class="post.content === post.server_content ? 'is-link' : 'is-danger'"
-                ></textarea>
-            </div>
-          <nav class="level is-mobile">
-            <div class="level-left">
-              <div class="thumbs is-size-4" v-if="post.id !== null">
-              <span class="has-text-info"  >
-                <span @click="like_post(post._idx, 'like')">
-                  <i class="fa fa-flip-horizontal fa-thumbs-up" v-if="post.like === 'like'"></i>
-                  <i class="fa fa-flip-horizontal fa-thumbs-o-up" v-else></i>
-                </span>
-                  <span class="is-size-7" v-if="post.likeCount !== 0">
-                  {{ post.likeCount }}
-                </span>
-                <span @click="like_post(post._idx, 'dislike')">
-                  <i class="fa fa-thumbs-down" v-if="post.like === 'dislike'"></i>
-                  <i class="fa fa-thumbs-o-down" v-else></i>
-                </span>
-              </span>
-                <span class="is-size-7" v-if="post.dislikeCount !== 0">
-                  {{ post.dislikeCount }}
-                </span>
-            </div>
-            </div>
-
-            <div class="level-right">
-              <!-- Error notification -->
-              <div v-if="post.error" class="level-item has-text-danger">
-                <i class="fa fa-exclamation-triangle"></i></div>
-              <!-- Edit button -->
-              <!-- TODO: implement it -->
-
-                <div v-if="post.email === user_email && !post.edit" class="level-item">
+            <div class="box has-background-light">
+                <div class="level">
+                    <figure class="is-64x64 image">
+                      <img class="is-rounded" :src="post.profile_pic">
+                    </figure >
+                    <div v-if="post.email === user_email && !post.edit" title="Edit" class="">
                     <button @click="do_edit(post._idx)" class="button is-warning" >
                         <i class="fa fa-edit fa-fw"></i>
                     </button>
                 </div>
-              <!-- Save button -->
-              <div v-if="post.edit" class="level-item">
-                <button @click="do_save(post._idx)" class="button is-primary"
-                :class="post.is_pending ? 'is-loading' : ''">
-                <i class="fa fa-check-square-o fa-fw"></i></button></div>
-              <!-- Cancel edit button -->
-              <div v-if="post.edit && !post.is_pending && !post.error" class="level-item">
-                <button @click="do_cancel(post._idx)" class="button is-danger">
-                <i class="fa fa-close"></i></button>
-              </div>
-              <!-- Delete post button, for replies only -->
-              <!-- TODO: implement it -->
-                <div v-if="post.is_reply && post.email === user_email" class="level-item">
-                    <button @click="do_delete(post._idx)" class="button is-danger" >
-                        <i class="fa fa-trash"></i>
-                    </button>
                 </div>
-              <!-- Reply button -->
-              <!-- TODO: implement it.  This has to show only for main posts,
-                   and it has to not show while you are editing the post. -->
-                <div v-if="!post.is_reply && !post.edit" class="level-item">
-                    <button @click="reply(post._idx)" class="button is-link" >
-                        <i class="fa fa-reply"></i>
-                    </button>
+                <div class="has-text-black">{{post.author}}</div>
+                <img :src="post.image" v-if="post.image" alt="" height="500" width="500">
+                <div v-if="!post.edit" @click="do_edit(post._idx)">{{post.content}}</div>
+                <textarea v-if="post.edit" v-model="post.content" class="textarea" :class="post.content === post.server_content ? 'is-link' : 'is-danger'"></textarea>
+                <div>
+                    <nav class="level is-mobile" style="margin-top:1em;">
+                        <div class="level-left">
+                          <div class="thumbs is-size-4" v-if="post.id !== null">
+                          <span class="has-text-info"  >
+                            <span @click="like_post(post._idx, 'like')">
+                              <i class="fa fa-flip-horizontal fa-thumbs-up" v-if="post.like === 'like'"></i>
+                              <i class="fa fa-flip-horizontal fa-thumbs-o-up" v-else></i>
+                            </span>
+                              <span class="is-size-7" v-if="post.likeCount !== 0">
+                              {{ post.likeCount }}
+                            </span>
+                            <span @click="like_post(post._idx, 'dislike')">
+                              <i class="fa fa-thumbs-down" v-if="post.like === 'dislike'"></i>
+                              <i class="fa fa-thumbs-o-down" v-else></i>
+                            </span>
+                          </span>
+                            <span class="is-size-7" v-if="post.dislikeCount !== 0">
+                              {{ post.dislikeCount }}
+                            </span>
+                        </div>
+                        </div>
+
+                        <div class="level-right">
+                          <!-- Error notification -->
+                          <div v-if="post.error" class="level-item has-text-danger">
+                            <i class="fa fa-exclamation-triangle"></i>
+                          </div>
+
+                            <div v-if="post.email === user_email && post.edit" v-bind:id="post._idx" class="button is-link level-item" @change="uploadImage($event, post._idx)">
+                                <i class="fa fa-picture-o" aria-hidden="true"></i>
+                                <input type="file" style="display: block; position: absolute; top: 0; right: 0; opacity: 0; font-size: 100px; filter: alpha(opacity=0); cursor: pointer;" />
+                            </div>
+
+
+                          <!-- Save button -->
+                          <div v-if="post.edit" title="Save" class="level-item">
+                            <button @click="do_save(post._idx)" class="button is-primary"
+                            :class="post.is_pending ? 'is-loading' : ''">
+                            <i class="fa fa-check-square-o fa-fw"></i></button></div>
+                          <!-- Cancel edit button -->
+                          <div v-if="post.edit && !post.is_pending && !post.error" title="Cancel" class="level-item">
+                            <button @click="do_cancel(post._idx)" class="button is-danger">
+                            <i class="fa fa-close"></i></button>
+                          </div>
+                          <!-- Delete post button, for replies only -->
+                          <!-- TODO: implement it -->
+                            <div v-if="post.email === user_email" class="level-item">
+                                <button @click="do_delete(post._idx)" class="button is-danger" >
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                          <!-- Reply button -->
+                          <!-- TODO: implement it.  This has to show only for main posts,
+                               and it has to not show while you are editing the post. -->
+                            <div v-if="!post.is_reply && !post.edit" class="level-item">
+                                <button @click="reply(post._idx)" class="button is-link" >
+                                    <i class="fa fa-reply"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </nav>
                 </div>
             </div>
-          </nav>
+
         </div>
       </div>
     </div>
